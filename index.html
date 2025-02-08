@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Musical Memory Puzzle</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: rgba(224, 219, 219, 0.903);
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      font-family: 'Poppins', sans-serif; /* Elegant font */
+      font-size: 3rem;
+      background: linear-gradient(90deg, #ff8a00, #e52e71, #9d50bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+      letter-spacing: 3px;
+      margin: 20px auto;
+      animation: glow 2s infinite ease-in-out;
+    }
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1),
+                     0 0 20px #ff8a00, 0 0 30px #e52e71, 0 0 40px #9d50bb;
+      }
+      50% {
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1),
+                     0 0 25px #ff8a00, 0 0 35px #e52e71, 0 0 50px #9d50bb;
+      }
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr); /* Default: 6 equal-width columns */
+      gap: 10px; /* Spacing between grid items */
+      max-width: 90%; /* Fit to screen width with padding */
+      margin: 20px auto;
+    }
+    .item {
+      background-color: lightblue;
+      border: 2px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      aspect-ratio: 1; /* Maintain square shape */
+    }
+    .large {
+      grid-column: span 6; /* Span all 6 columns */
+      background-color: rgba(224, 219, 219, 0.903);
+      aspect-ratio: 5 / 1;
+      border: transparent;
+    }
+    .timer-button {
+      display: inline-block;
+      background: linear-gradient(45deg, #ff7f50, #ff4500);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    .timer-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+    }
+    .timer-button:active {
+      transform: scale(0.95);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    /* Responsiveness for smaller screens */
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium devices */
+      }
+      .large {
+        grid-column: span 3; /* Span all 3 columns */
+      }
+    }
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on small devices */
+      }
+      .large {
+        grid-column: span 2; /* Span all 2 columns */
+      }
+    }
+    @media (max-width: 320px) {
+      .grid-container {
+        grid-template-columns: 1fr; 
+      }
+      .large {
+        grid-column: span 1; 
+      }
+    }
+    .item i {
+      font-size: 6rem; /* Override Font Awesome's default size */
+      color: rgb(0, 0, 0);
+    }
+  </style>
+</head>
+<body>
+  <h1>Musical Memory Puzzle</h1>
+  <div id="game-grid">
+    <div class="grid-container">
+      <!-- Top Row: Computer's Sequence (6 icons) -->
+      <div class="item" data-index="0"><i class="fa-regular fa-hand"></i></div>
+      <div class="item" data-index="1"><i class="fa-regular fa-face-smile"></i></div>
+      <div class="item" data-index="2"><i class="fa-regular fa-heart"></i></div>
+      <div class="item" data-index="3"><i class="fa-regular fa-snowflake"></i></div>
+      <div class="item" data-index="4"><i class="fa-solid fa-exclamation"></i></div>
+      <div class="item" data-index="5"><i class="fa-regular fa-lightbulb"></i></div>
+      
+      <!-- Middle Row: Timer Button -->
+      <div class="item large">
+        <button id="timerButton" class="timer-button">Press Here To Start</button>
+      </div>
+      
+      <!-- Bottom Row: User's Selection (6 icons) -->
+      <div class="item" data-index="0"><i class="fa-regular fa-face-smile"></i></div>
+      <div class="item" data-index="1"><i class="fa-solid fa-exclamation"></i></div>
+      <div class="item" data-index="2"><i class="fa-regular fa-heart"></i></div>
+      <div class="item" data-index="3"><i class="fa-regular fa-hand"></i></div>
+      <div class="item" data-index="4"><i class="fa-regular fa-lightbulb"></i></div>
+      <div class="item" data-index="5"><i class="fa-regular fa-snowflake"></i></div>
+    </div>
+  </div>
+  <audio src="Audio/butclick1.wav"></audio>
+  <script>
+    /**********************************************************************
+     * Musical Memory Puzzle Logic (Using your provided markup & styles)
+     **********************************************************************/
+    // Separate the grid items into computer (top row) and user (bottom row)
+    const allItems = document.querySelectorAll('.grid-container .item');
+    const computerBoxes = []; // top 6 items (indices 0-5)
+    const userBoxes = [];     // bottom 6 items (indices 7-12); index 6 is the large button
+    allItems.forEach((item, index) => {
+      if (index < 6) {
+        computerBoxes.push(item);
+      } else if (index > 6) { // skip index 6 (the large item)
+        userBoxes.push(item);
+      }
+    });
+    
+    const timerButton = document.getElementById('timerButton');
+    
+    // Game variables
+    let mmpTime = 60;             // starting time in seconds
+    let mmpTimerInterval = null;  // holds timer interval
+    let computerSequence = [];    // computer's sequence (each element: a number 0–5)
+    let userSequence = [];        // user's input sequence
+    let isUserTurn = false;       // flag to control when clicks are allowed
+    
+    // Update timerButton text with remaining time
+    function updateTimerButton() {
+      timerButton.textContent = "Time: " + mmpTime;
+    }
+    
+    // Start the countdown timer
+    function startMmpTimer() {
+      mmpTimerInterval = setInterval(() => {
+        mmpTime--;
+        updateTimerButton();
+        if (mmpTime <= 0) {
+          mmpTime = 0;
+          updateTimerButton();
+          endMmpGame();
+        }
+      }, 1000);
+    }
+    
+    // End the game: stop timer, disable user input, alert Game Over
+    function endMmpGame() {
+      clearInterval(mmpTimerInterval);
+      isUserTurn = false;
+      alert("Game Over!");
+      userBoxes.forEach(box => box.style.pointerEvents = "none");
+    }
+    
+    // Reset the computer row visuals (clear any flash effects)
+    function resetComputerRow() {
+      computerBoxes.forEach(box => {
+        box.style.backgroundColor = "lightblue";
+        box.textContent = "";
+      });
+    }
+    
+    // Flash the computer's sequence one by one
+    function flashSequence(index = 0) {
+      if (index >= computerSequence.length) {
+        // Finished flashing; allow user to start input
+        isUserTurn = true;
+        userSequence = [];
+        return;
+      }
+      let boxIndex = computerSequence[index];
+      let box = computerBoxes[boxIndex];
+      // Flash the box: deep green with a star
+      box.style.backgroundColor = "#00BE3D";
+      setTimeout(() => {
+        box.style.backgroundColor = "lightblue";
+        setTimeout(() => {
+          flashSequence(index + 1);
+        }, 300); // delay between flashes
+      }, 700);
+    }
+    
+    // Start a new round: add one new random element and flash the updated sequence
+    function startMmpRound() {
+      isUserTurn = false;
+      // Add a new random number (0 to 5)
+      const rand = Math.floor(Math.random() * computerBoxes.length);
+      computerSequence.push(rand);
+      resetComputerRow();
+      flashSequence();
+    }
+    
+    // Handle user clicks on bottom row boxes
+    function handleUserClick(event) {
+      if (!isUserTurn) return;
+      const clickedBox = event.currentTarget;
+      // Retrieve the user box's designated index (from its data-index attribute)
+      const userChoice = parseInt(clickedBox.getAttribute('data-index'));
+      
+      // Flash the clicked box in light green (user feedback)
+      clickedBox.style.backgroundColor = "#52d68a";
+      setTimeout(() => {
+        clickedBox.style.backgroundColor = "lightblue";
+      }, 300);
+      
+      userSequence.push(userChoice);
+      
+      // Check the user's input against the computer sequence so far
+      for (let i = 0; i < userSequence.length; i++) {
+        if (userSequence[i] !== computerSequence[i]) {
+          // Incorrect input: flash red, subtract 30 seconds, replay sequence
+          clickedBox.style.backgroundColor = "#E14F5D";
+          setTimeout(() => {
+            clickedBox.style.backgroundColor = "lightblue";
+          }, 300);
+          mmpTime -= 30;
+          if (mmpTime < 0) mmpTime = 0;
+          updateTimerButton();
+          isUserTurn = false;
+          setTimeout(() => {
+            flashSequence();
+          }, 1000);
+          return;
+        }
+      }
+      
+      // If the user has completed the entire sequence correctly:
+      if (userSequence.length === computerSequence.length) {
+        mmpTime += 10;  // add bonus time
+        updateTimerButton();
+        isUserTurn = false;
+        setTimeout(() => {
+          startMmpRound();
+        }, 1000);
+      }
+    }
+    
+    // Attach click listeners to each user (bottom row) box
+    userBoxes.forEach(box => {
+      box.addEventListener('click', handleUserClick);
+    });
+    
+    // Start the game when the timer button is pressed
+    timerButton.onclick = function() {
+      // Start timer only once
+      if (!mmpTimerInterval) {
+        startMmpTimer();
+      }
+      // Reset sequences and begin first round
+      computerSequence = [];
+      userSequence = [];
+      startMmpRound();
+    };
+    
+    // Initialize the timer button display
+    updateTimerButton();
+  </script>
+</body>
+</html>
